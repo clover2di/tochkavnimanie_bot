@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Контент бота - Админ-панель{% endblock %}
+{% block page_title %}Контент бота{% endblock %}
+
+{% block content %}
+<div class="table-card">
+    <div class="card-header">
+        <h5 class="mb-0">Тексты сообщений бота</h5>
+        <small class="text-muted">Редактируйте тексты, которые бот отправляет участникам</small>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Название</th>
+                    <th>Текущее значение</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, info in default_content.items() %}
+                <tr>
+                    <td>
+                        <strong>{{ info[0] }}</strong>
+                        <br><small class="text-muted">{{ info[1] }}</small>
+                    </td>
+                    <td style="max-width: 400px;">
+                        {% if content_dict.get(key) %}
+                            <span class="text-truncate d-block" style="max-width: 400px;" title="{{ content_dict.get(key) }}">
+                                {{ content_dict.get(key)[:100] }}{% if content_dict.get(key)|length > 100 %}...{% endif %}
+                            </span>
+                        {% else %}
+                            <span class="text-muted fst-italic text-truncate d-block" style="max-width: 400px;" title="{{ info[2] }}">
+                                {{ info[2][:100] }}{% if info[2]|length > 100 %}...{% endif %}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if content_dict.get(key) %}
+                        <span class="badge bg-success">Изменено</span>
+                        {% else %}
+                        <span class="badge bg-secondary">По умолчанию</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/content/{{ key }}/edit" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Редактировать
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

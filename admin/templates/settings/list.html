@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Настройки - Админ-панель{% endblock %}
+{% block page_title %}Настройки{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Основные настройки</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/settings/update">
+                    {{ csrf_token_input(request) | safe }}
+                    {% for key, (title, value_type, default) in default_settings.items() %}
+                    <div class="mb-3">
+                        {% if value_type == 'bool' %}
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="{{ key }}" name="{{ key }}" value="true"
+                                   {% if settings_dict.get(key, default) == 'true' %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ key }}">{{ title }}</label>
+                        </div>
+                        {% elif value_type == 'int' %}
+                        <label for="{{ key }}" class="form-label">{{ title }}</label>
+                        <input type="number" class="form-control" id="{{ key }}" name="{{ key }}" 
+                               value="{{ settings_dict.get(key, default) }}">
+                        {% else %}
+                        <label for="{{ key }}" class="form-label">{{ title }}</label>
+                        <input type="text" class="form-control" id="{{ key }}" name="{{ key }}" 
+                               value="{{ settings_dict.get(key, default) }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i> Сохранить настройки
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

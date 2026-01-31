@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Редактирование сообщения' if broadcast else 'Новое сообщение' }} - Админ-панель{% endblock %}
+{% block page_title %}{{ 'Редактирование сообщения' if broadcast else 'Новое сообщение' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="table-card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data"
+                      action="{{ '/broadcasts/' ~ broadcast.id ~ '/edit' if broadcast else '/broadcasts/new' }}">
+                    {{ csrf_token_input(request) | safe }}
+                    
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Текст сообщения *</label>
+                        <textarea class="form-control" id="text" name="text" rows="8" required
+                                  placeholder="Введите текст сообщения...">{{ broadcast.text if broadcast else '' }}</textarea>
+                        <div class="form-text">
+                            Поддерживается HTML: &lt;b&gt;жирный&lt;/b&gt;, &lt;i&gt;курсив&lt;/i&gt;, &lt;a href="url"&gt;ссылка&lt;/a&gt;
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="image" class="form-label">Изображение (опционально)</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <div class="form-text">
+                            Форматы: JPG, PNG, GIF. Рекомендуемый размер: 1280x720 px
+                        </div>
+                        
+                        {% if broadcast and broadcast.image_path %}
+                        <div class="mt-2">
+                            <span class="badge bg-info"><i class="bi bi-image me-1"></i> Изображение прикреплено</span>
+                            <small class="text-muted ms-2">Загрузите новое, чтобы заменить</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Сохранить
+                        </button>
+                        <a href="/broadcasts" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle me-1"></i> Подсказка</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Сообщение будет отправлено <strong>всем участникам</strong> бота.
+                </p>
+                
+                <p class="small text-muted mb-2">
+                    <strong>Поддерживаемые HTML-теги:</strong>
+                </p>
+                <ul class="small text-muted">
+                    <li><code>&lt;b&gt;</code> — жирный текст</li>
+                    <li><code>&lt;i&gt;</code> — курсив</li>
+                    <li><code>&lt;u&gt;</code> — подчёркнутый</li>
+                    <li><code>&lt;s&gt;</code> — зачёркнутый</li>
+                    <li><code>&lt;a href="..."&gt;</code> — ссылка</li>
+                    <li><code>&lt;code&gt;</code> — моноширинный</li>
+                </ul>
+                
+                <div class="alert alert-warning py-2 mt-3 mb-0">
+                    <small>
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        После отправки сообщение нельзя отозвать
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Заявка #{{ application.id }} - Админ-панель{% endblock %}
+{% block page_title %}Заявка #{{ application.id }}{% endblock %}
+
+{% block content %}
+<!-- Back Button -->
+<div class="mb-3">
+    <a href="/applications" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Назад к списку
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Application Details -->
+    <div class="col-md-8">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Информация о заявке</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Этап</h6>
+                        <p class="fs-5"><span class="badge bg-primary">{{ application.nomination.name }}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Дата подачи</h6>
+                        <p>{{ application.created_at|format_datetime }}</p>
+                    </div>
+                </div>
+                
+                <!-- Files Section (Photos and PDFs) -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Файлы работы ({{ application.photos|from_json|length if application.photos else 0 }} шт.)</h6>
+                    <div class="row g-2">
+                        {% if application.photos %}
+                            {% set photos = application.photos|from_json %}
+                            {% set file_links = application.photos_remote_paths|from_json if application.photos_remote_paths else [] %}
+                            {% for i in range(photos|length) %}
+                            <div class="col-md-4 col-6">
+                                <div class="card h-100 photo-card">
+                                    {% if file_links and i < file_links|length %}
+                                        {% set file_url = file_links[i] %}
+                                        {% if file_url.endswith('.pdf') %}
+                                        <!-- PDF File -->
+                                        <div class="card-body text-center p-3">
+                                            <i class="bi bi-file-earmark-pdf display-4 text-danger mb-2"></i>
+                                            <p class="small mb-2">PDF документ {{ i + 1 }}</p>
+                                            <a href="{{ file_url }}" target="_blank" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-eye"></i> Открыть PDF
+                                            </a>
+                                        </div>
+                                        {% else %}
+                                        <!-- Image File -->
+                                        <a href="{{ file_url }}" target="_blank" class="photo-link">
+                                            <img src="{{ file_url }}" class="card-img-top photo-preview" alt="Фото {{ i + 1 }}">
+                                        </a>
+                                        <div class="card-body text-center p-2">
+                                            <small class="text-muted">Фото {{ i + 1 }} — нажмите для просмотра</small>
+                                        </div>
+                                        {% endif %}
+                                    {% else %}
+                                    <div class="card-body text-center p-3">
+                                        <i class="bi bi-image display-4 text-muted mb-2"></i>
+                                        <p class="small mb-2">Файл {{ i + 1 }}</p>
+                                        <small class="text-muted">ID: {{ photos[i][:15] }}...</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="col-12">
+                            <p class="text-muted">Файлы не загружены</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Comment Section -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Комментарий участника</h6>
+                    {% if application.voice_file_id %}
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-mic-fill me-3 fs-3"></i>
+                            <strong>Голосовое сообщение</strong>
+                        </div>
+                        {% if application.voice_remote_path %}
+                        <!-- Audio Player -->
+                        <audio controls class="w-100 mb-2" style="height: 40px;">
+                            <source src="{{ application.voice_remote_path }}" type="audio/ogg">
+                            Ваш браузер не поддерживает воспроизведение аудио.
+                        </audio>
+                        <a href="{{ application.voice_remote_path }}" download class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i> Скачать
+                        </a>
+                        {% else %}
+                        <small class="text-muted">Telegram Voice ID: {{ application.voice_file_id[:30] }}...</small>
+                        {% endif %}
+                    </div>
+                    {% elif application.comment_text %}
+                    <div class="p-3 bg-light rounded">
+                        <i class="bi bi-quote"></i> {{ application.comment_text }}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Комментарий не оставлен</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Participant Info -->
+    <div class="col-md-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Данные участника</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-muted mb-1">ФИО</h6>
+                    <p>{{ application.user.full_name or 'Не указано' }}</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted mb-1">Telegram</h6>
+                    <p>
+                        {% if application.user.username %}
+                        <a href="https://t.me/{{ application.user.username }}" target="_blank">
+                            <i class="bi bi-telegram"></i> @{{ application.user.username }}
+                        </a>
+                        {% else %}
+                        ID: {{ application.user.telegram_id }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted mb-1">Класс</h6>
+                    <p>{{ application.user.grade or 'Не указан' }}</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted mb-1">Город</h6>
+                    <p>{{ application.user.city or 'Не указан' }}</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted mb-1">Школа</h6>
+                    <p>{{ application.user.school or 'Не указана' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.photo-card {
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+.photo-card:hover {
+    border-color: #667eea;
+}
+.photo-preview {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.photo-preview:hover {
+    transform: scale(1.05);
+}
+.photo-link {
+    display: block;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Бэкапы - Админ-панель{% endblock %}
+{% block page_title %}Резервные копии{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-database"></i> Бэкапы базы данных
+        </h5>
+        <form method="POST" action="/backups/create" class="d-inline">
+            {{ csrf_token_input(request) | safe }}
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i> Создать бэкап
+            </button>
+        </form>
+    </div>
+    
+    <div class="card-body">
+        {% if message %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+        
+        {% if backups %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Файл</th>
+                        <th>Размер</th>
+                        <th>Дата создания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr>
+                        <td>
+                            <i class="bi bi-file-earmark-zip text-primary"></i>
+                            {{ backup.filename }}
+                        </td>
+                        <td>{{ backup.size_mb }} МБ</td>
+                        <td>{{ backup.created | format_datetime }}</td>
+                        <td>
+                            <a href="/backups/download/{{ backup.filename }}" 
+                               class="btn btn-sm btn-outline-primary" title="Скачать">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <form method="POST" action="/backups/delete/{{ backup.filename }}" 
+                                  class="d-inline" onsubmit="return confirm('Удалить этот бэкап?');">
+                                {{ csrf_token_input(request) | safe }}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-database" style="font-size: 3rem;"></i>
+            <p class="mt-3">Бэкапов пока нет. Создайте первый!</p>
+        </div>
+        {% endif %}
+        
+        <div class="mt-4">
+            <div class="alert alert-secondary">
+                <h6><i class="bi bi-info-circle"></i> Информация</h6>
+                <ul class="mb-0">
+                    <li>Бэкапы хранятся в папке <code>backups/</code></li>
+                    <li>Хранится максимум 10 последних бэкапов</li>
+                    <li>Автоматические бэкапы создаются каждые 24 часа (если включено)</li>
+                    <li>Для восстановления: остановите бота, замените <code>database/bot.db</code> файлом бэкапа</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Админ-панель{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/static/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'FuturaPT';
+            src: url('/static/fonts/FTX45ACh.otf') format('opentype');
+            font-weight: 300;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'FuturaPT';
+            src: url('/static/fonts/FTX46ACh.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'FuturaPT';
+            src: url('/static/fonts/FTX85ACh.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'FuturaPT';
+            src: url('/static/fonts/FTX95ACh.otf') format('opentype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        :root {
+            --sidebar-width: 250px;
+            --color-bg: #f8f8f8;
+            --color-primary: #eb3d24;
+            --color-secondary: #29a64a;
+            --color-text: #58595b;
+        }
+        body {
+            min-height: 100vh;
+            color: var(--color-text);
+            font-family: 'FuturaPT', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--color-primary);
+            padding-top: 1rem;
+            z-index: 1000;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.85);
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--color-bg);
+        }
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content {
+            padding: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+        }
+        .stat-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .table-card {
+            background: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        .table-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1rem 1.5rem;
+        }
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+        }
+        /* Override Bootstrap colors */
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #d63520;
+            border-color: #d63520;
+        }
+        .btn-outline-primary {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+        .btn-success {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+        .btn-success:hover, .btn-success:focus {
+            background-color: #238a3e;
+            border-color: #238a3e;
+        }
+        .bg-primary {
+            background-color: var(--color-primary) !important;
+        }
+        .bg-success {
+            background-color: var(--color-secondary) !important;
+        }
+        .text-primary {
+            color: var(--color-primary) !important;
+        }
+        .text-success {
+            color: var(--color-secondary) !important;
+        }
+        .badge.bg-primary {
+            background-color: var(--color-primary) !important;
+        }
+        .badge.bg-success {
+            background-color: var(--color-secondary) !important;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--color-primary);
+            box-shadow: none;
+        }
+        .card, .table-card, .stat-card {
+            box-shadow: none !important;
+        }
+        a {
+            color: var(--color-primary);
+        }
+        a:hover {
+            color: #d63520;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--color-text);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user %}
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link {% if '/applications' in request.url.path %}active{% endif %}" href="/applications">
+                    <i class="bi bi-file-earmark-text"></i> Заявки
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/participants' in request.url.path %}active{% endif %}" href="/participants">
+                    <i class="bi bi-people"></i> Участники
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/nominations' in request.url.path %}active{% endif %}" href="/nominations">
+                    <i class="bi bi-flag"></i> Этапы
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/content' in request.url.path %}active{% endif %}" href="/content">
+                    <i class="bi bi-chat-quote"></i> Контент бота
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/broadcasts' in request.url.path %}active{% endif %}" href="/broadcasts">
+                    <i class="bi bi-megaphone"></i> Сообщения
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/backups' in request.url.path %}active{% endif %}" href="/backups">
+                    <i class="bi bi-database"></i> Бэкапы
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/logs' in request.url.path %}active{% endif %}" href="/logs">
+                    <i class="bi bi-journal-text"></i> Логи
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if '/settings' in request.url.path %}active{% endif %}" href="/settings">
+                    <i class="bi bi-gear"></i> Настройки
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content {% if not user %}ms-0{% endif %}">
+        {% if user %}
+        <div class="top-bar">
+            <h4 class="mb-0">{% block page_title %}{% endblock %}</h4>
+            <div class="d-flex align-items-center gap-3">
+                <span><i class="bi bi-person-circle"></i> {{ user }}</span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Выход
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

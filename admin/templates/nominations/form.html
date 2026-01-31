@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Редактирование' if nomination else 'Новый этап' }} - Админ-панель{% endblock %}
+{% block page_title %}{{ 'Редактирование этапа' if nomination else 'Новый этап' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="table-card">
+            <div class="card-body">
+                <form method="POST" action="{{ '/nominations/' ~ nomination.id ~ '/edit' if nomination else '/nominations/new' }}">
+                    {{ csrf_token_input(request) | safe }}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название этапа *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ nomination.name if nomination else '' }}" required
+                               placeholder="Например: Исследование проблемы">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="4">{{ nomination.description if nomination else '' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="start_date" class="form-label">Дата начала</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                                   value="{{ nomination.start_date.strftime('%Y-%m-%d') if nomination and nomination.start_date else '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="deadline" class="form-label">Дата окончания</label>
+                            <input type="date" class="form-control" id="deadline" name="deadline"
+                                   value="{{ nomination.deadline.strftime('%Y-%m-%d') if nomination and nomination.deadline else '' }}">
+                        </div>
+                    </div>
+                    <small class="text-muted d-block mb-3">Подать заявку на этап можно только в указанные сроки</small>
+                    
+                    {% if nomination %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="true"
+                                   {% if nomination.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Этап активен
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Сохранить
+                        </button>
+                        <a href="/nominations" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

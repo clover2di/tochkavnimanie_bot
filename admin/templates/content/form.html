@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Контент бота{% endblock %}
+{% block page_title %}Редактирование: {{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="table-card">
+            <div class="card-body">
+                <p class="text-muted mb-4">{{ description }}</p>
+                
+                <form method="POST" action="/content/{{ key }}/edit">
+                    {{ csrf_token_input(request) | safe }}
+                    <div class="mb-3">
+                        <label for="value" class="form-label">Текст сообщения</label>
+                        <textarea class="form-control" id="value" name="value" rows="6" 
+                                  placeholder="Введите текст...">{{ value if value else default_value }}</textarea>
+                        <div class="form-text">
+                            Поддерживается HTML-разметка: &lt;b&gt;жирный&lt;/b&gt;, &lt;i&gt;курсив&lt;/i&gt;, &lt;a href="url"&gt;ссылка&lt;/a&gt;
+                        </div>
+                    </div>
+                    
+                    {% if default_value and value and value != default_value %}
+                    <div class="alert alert-secondary py-2 mb-3">
+                        <small><strong>Значение по умолчанию:</strong></small><br>
+                        <small class="text-muted">{{ default_value }}</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Сохранить
+                        </button>
+                        <a href="/content" class="btn btn-outline-secondary">Отмена</a>
+                        {% if value %}
+                        <a href="/content/{{ key }}/reset" class="btn btn-outline-warning" onclick="return confirm('Сбросить к значению по умолчанию?')">
+                            <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h6 class="mb-0">Подсказка</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Поддерживаемые HTML-теги для Telegram:
+                </p>
+                <ul class="small">
+                    <li><code>&lt;b&gt;</code> - жирный текст</li>
+                    <li><code>&lt;i&gt;</code> - курсив</li>
+                    <li><code>&lt;u&gt;</code> - подчёркнутый</li>
+                    <li><code>&lt;a href="..."&gt;</code> - ссылка</li>
+                    <li><code>&lt;code&gt;</code> - моноширинный</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
